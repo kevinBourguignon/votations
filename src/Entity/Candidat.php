@@ -4,17 +4,24 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CandidatRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CandidatRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]
 class Candidat
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('toto')]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
@@ -25,14 +32,6 @@ class Candidat
 
     #[ORM\Column(length: 255)]
     private ?string $slogan = null;
-
-    #[ORM\OneToMany(targetEntity: SessionsCandidat::class, mappedBy: 'candidat')]
-    private Collection $candidat;
-
-    public function __construct()
-    {
-        $this->candidat = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -71,36 +70,6 @@ class Candidat
     public function setSlogan(string $slogan): static
     {
         $this->slogan = $slogan;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, SessionsCandidat>
-     */
-    public function getCandidat(): Collection
-    {
-        return $this->candidat;
-    }
-
-    public function addCandidat(SessionsCandidat $candidat): static
-    {
-        if (!$this->candidat->contains($candidat)) {
-            $this->candidat->add($candidat);
-            $candidat->setCandidat($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCandidat(SessionsCandidat $candidat): static
-    {
-        if ($this->candidat->removeElement($candidat)) {
-            // set the owning side to null (unless already changed)
-            if ($candidat->getCandidat() === $this) {
-                $candidat->setCandidat(null);
-            }
-        }
 
         return $this;
     }
